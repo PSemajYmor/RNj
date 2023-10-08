@@ -5,56 +5,50 @@
 </head>
 <body>
     <h1>JSON File Updater</h1>
-    
-    <button id="onButton">On2</button>
+    <button id="onButton">On</button>
     <button id="offButton">Off</button>
 
     <script>
-        const onButton = document.getElementById('onButton');
-        const offButton = document.getElementById('offButton');
+        const jsonFilePath = 'buttondata.json';
+        const baseUrl = 'https://raw.githubusercontent.com/PSemajYmor/RNj/main/';
 
-        onButton.addEventListener('click', () => {
-            updateJSONFile(1);
+        document.getElementById('onButton').addEventListener('click', () => {
+            updateJSON(1);
         });
 
-        offButton.addEventListener('click', () => {
-            updateJSONFile(0);
+        document.getElementById('offButton').addEventListener('click', () => {
+            updateJSON(0);
         });
 
-        function updateJSONFile(newValue) {
-            const fileUrl = 'https://raw.githubusercontent.com/PSemajYmor/RNj/main/buttondata.json';
-            
-            // Fetch the current content of the JSON file
-            fetch(fileUrl)
-                .then(response => response.text())
-                .then(jsonString => {
-                    // Parse the existing JSON content
-                    const jsonData = JSON.parse(jsonString);
-                    
-                    // Update the value in the JSON data
-                    jsonData.value = newValue;
-                    
-                    // Convert the JSON data back to a string
-                    const updatedJsonString = JSON.stringify(jsonData, null, 2);
-                    
-                    // Send a PUT request to update the file with the new content
-                    fetch(fileUrl, {
-                        method: 'PUT',
-                        body: updatedJsonString,
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    })
-                    .then(() => {
-                        console.log('JSON file updated successfully.');
-                    })
-                    .catch(error => {
-                        console.error('Error updating JSON file:', error);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching JSON file:', error);
-                });
+        async function updateJSON(value) {
+            const url = `${baseUrl}${jsonFilePath}`;
+            const response = await fetch(url);
+            const jsonContent = await response.json();
+
+            // Update the JSON content
+            jsonContent.value = value;
+
+            // Convert JSON to a string
+            const updatedContent = JSON.stringify(jsonContent, null, 2);
+
+            // Create a Blob with the updated content
+            const blob = new Blob([updatedContent], { type: 'application/json' });
+
+            // Create a URL for the updated Blob
+            const updatedUrl = URL.createObjectURL(blob);
+
+            // Create an anchor element to trigger the download
+            const a = document.createElement('a');
+            a.href = updatedUrl;
+            a.download = 'file.json';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+
+            // Click the anchor element to trigger the download
+            a.click();
+
+            // Clean up the URL object
+            URL.revokeObjectURL(updatedUrl);
         }
     </script>
 </body>
