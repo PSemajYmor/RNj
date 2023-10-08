@@ -5,7 +5,7 @@
 </head>
 <body>
     <h1>JSON File Updater</h1>
-    <button id="onButton">On</button>
+    <button id="onButton">On1</button>
     <button id="offButton">Off</button>
 
     <script>
@@ -26,29 +26,36 @@
             const jsonContent = await response.json();
 
             // Update the JSON content
-            jsonContent.value = value;
+            //jsonContent.value = value;
 
             // Convert JSON to a string
-            const updatedContent = JSON.stringify(jsonContent, null, 2);
+            //const updatedContent = JSON.stringify(jsonContent, null, 2);
 
-            // Create a Blob with the updated content
-            const blob = new Blob([updatedContent], { type: 'application/json' });
+            // Update the JSON content
+            jsonContent.content = btoa(JSON.stringify({ value }));
 
-            // Create a URL for the updated Blob
-            const updatedUrl = URL.createObjectURL(blob);
+            // Create the PUT request to update the file
+            const updateRequest = {
+                method: 'PUT',
+                headers: {
+                    //'Authorization': 'Bearer YOUR_GITHUB_TOKEN', // Replace with your GitHub token
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: 'Update JSON',
+                    content: jsonContent.content,
+                    sha: jsonContent.sha,
+                }),
+            };
 
-            // Create an anchor element to trigger the download
-            const a = document.createElement('a');
-            a.href = updatedUrl;
-            a.download = 'file.json';
-            a.style.display = 'none';
-            document.body.appendChild(a);
-
-            // Click the anchor element to trigger the download
-            a.click();
-
-            // Clean up the URL object
-            URL.revokeObjectURL(updatedUrl);
+            // Make the PUT request to update the file
+            const updateResponse = await fetch(url, updateRequest);
+            
+            if (updateResponse.status === 200) {
+                console.log('JSON file updated successfully.');
+            } else {
+                console.error('Failed to update JSON file.');
+            }
         }
     </script>
 </body>
