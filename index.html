@@ -5,7 +5,7 @@
 </head>
 <body>
     <h1>JSON File Updater</h1>
-    <button id="onButton">On</button>
+    <button id="onButton">Onb</button>
     <button id="offButton">Off</button>
 
     <script>
@@ -25,13 +25,13 @@
             const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${jsonFilePath}`;
             const response = await fetch(url);
             const jsonContent = await response.json();
-
+            alert('url fetched!');
             // Update the JSON content
             jsonContent.value = value;
 
-            // Convert the updated JSON content to a string
+            alert('Convert the updated JSON content to a string');
             const updatedContent = JSON.stringify(jsonContent, null, 2);
-
+ 
             // Make a PUT request to update the file in the repository
             await fetch(url, {
                 method: 'PUT',
