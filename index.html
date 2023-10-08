@@ -5,12 +5,10 @@
 </head>
 <body>
     <h1>JSON File Updater</h1>
-    <button id="onButton">Onb</button>
+    <button id="onButton">On</button>
     <button id="offButton">Off</button>
 
     <script>
-        const repoOwner = '<PSemajYmor>';
-        const repoName = '<RNj>';
         const jsonFilePath = 'buttondata.json';
 
         document.getElementById('onButton').addEventListener('click', () => {
@@ -22,26 +20,33 @@
         });
 
         async function updateJSON(value) {
-            const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${jsonFilePath}`;
+            const baseUrl = 'https://raw.githubusercontent.com/PSemajYmor/RNj/main/';
+            const url = `${baseUrl}${jsonFilePath}`;
+            
             const response = await fetch(url);
-            const jsonContent = await response.json();
-            alert('url fetched!');
-            // Update the JSON content
-            jsonContent.value = value;
+            
+            if (response.ok) {
+                const jsonContent = await response.json();
 
-            alert('Convert the updated JSON content to a string');
-            const updatedContent = JSON.stringify(jsonContent, null, 2);
- 
-            // Make a PUT request to update the file in the repository
-            await fetch(url, {
-                method: 'PUT',
-                body: updatedContent,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+                // Update the JSON content
+                jsonContent.value = value;
 
-            alert('JSON file updated successfully!');
+                // Convert the updated JSON content to a string
+                const updatedContent = JSON.stringify(jsonContent, null, 2);
+
+                // Make a PUT request to update the file
+                await fetch(url, {
+                    method: 'PUT',
+                    body: updatedContent,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                alert('JSON file updated successfully!');
+            } else {
+                alert('Failed to fetch JSON file.');
+            }
         }
     </script>
 </body>
