@@ -1,33 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Update JSON</title>
+    <title>JSON File Updater</title>
 </head>
 <body>
-    <button id="updateJsonButton">Update JSON11</button>
+    <h1>JSON File Updater</h1>
+    <button id="onButton">On</button>
+    <button id="offButton">Off</button>
 
     <script>
-        document.getElementById('updateJsonButton').addEventListener('click', async () => {
-            const jsonData = { "led_state": "6" }; // Replace with your updated JSON data
-            const jsonFileURL = 'https://raw.githubusercontent.com/PSemajYmor/RNj/main/buttondata.json'; // Replace with your repository URL and JSON file path
+        const jsonFilePath = 'buttondata.json';
+        const baseUrl = 'https://raw.githubusercontent.com/PSemajYmor/RNj/main/';
 
-            try {
-                const response = await fetch(jsonFileURL, {
-                    method: 'PUT',
-                    body: JSON.stringify(jsonData),
-                });
-
-                if (response.ok) {
-                    alert('JSON file updated successfully');
-                } else {
-                    alert('Failed to update JSON file');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred');
-            }
+        document.getElementById('onButton').addEventListener('click', () => {
+            updateJSON(1);
         });
+
+        document.getElementById('offButton').addEventListener('click', () => {
+            updateJSON(0);
+        });
+
+        async function updateJSON(value) {
+            const url = `${baseUrl}${jsonFilePath}`;
+            const response = await fetch(url);
+            const jsonContent = await response.json();
+
+            // Update the JSON content
+            jsonContent.value = value;
+
+            // Convert JSON to a string
+            const updatedContent = JSON.stringify(jsonContent, null, 2);
+
+            // Create a Blob with the updated content
+            const blob = new Blob([updatedContent], { type: 'application/json' });
+
+            // Create a URL for the updated Blob
+            const updatedUrl = URL.createObjectURL(blob);
+
+            // Create an anchor element to trigger the download
+            const a = document.createElement('a');
+            a.href = updatedUrl;
+            a.download = 'file.json';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+
+            // Click the anchor element to trigger the download
+            a.click();
+
+            // Clean up the URL object
+            URL.revokeObjectURL(updatedUrl);
+        }
     </script>
 </body>
 </html>
