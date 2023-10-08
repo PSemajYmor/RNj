@@ -9,8 +9,9 @@
     <button id="offButton">Off</button>
 
     <script>
+        const repoOwner = '<PSemajYmor>';
+        const repoName = '<RNj>';
         const jsonFilePath = 'buttondata.json';
-        const baseUrl = 'https://raw.githubusercontent.com/PSemajYmor/RNj/main/';
 
         document.getElementById('onButton').addEventListener('click', () => {
             updateJSON(1);
@@ -21,34 +22,26 @@
         });
 
         async function updateJSON(value) {
-            const url = `${baseUrl}${jsonFilePath}`;
+            const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${jsonFilePath}`;
             const response = await fetch(url);
             const jsonContent = await response.json();
 
             // Update the JSON content
             jsonContent.value = value;
 
-            // Convert JSON to a string
+            // Convert the updated JSON content to a string
             const updatedContent = JSON.stringify(jsonContent, null, 2);
 
-            // Create a Blob with the updated content
-            const blob = new Blob([updatedContent], { type: 'application/json' });
+            // Make a PUT request to update the file in the repository
+            await fetch(url, {
+                method: 'PUT',
+                body: updatedContent,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
-            // Create a URL for the updated Blob
-            const updatedUrl = URL.createObjectURL(blob);
-
-            // Create an anchor element to trigger the download
-            const a = document.createElement('a');
-            a.href = updatedUrl;
-            a.download = 'file.json';
-            a.style.display = 'none';
-            document.body.appendChild(a);
-
-            // Click the anchor element to trigger the download
-            a.click();
-
-            // Clean up the URL object
-            URL.revokeObjectURL(updatedUrl);
+            alert('JSON file updated successfully!');
         }
     </script>
 </body>
